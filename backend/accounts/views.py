@@ -14,7 +14,7 @@ User = get_user_model()
 class LogoutAPIView(APIView):
     permission_classes = (IsAuthenticated,)
 
-    def post(self, request):
+    def get(self, request):
         logout(request)
         return Response(
             data={"message": f"Bye {request.user.username}!"},
