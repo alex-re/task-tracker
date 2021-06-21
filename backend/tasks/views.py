@@ -16,12 +16,14 @@ class TaskList(APIView):
     Retrieve, read or create a task instance.
     """
 
-    permission_classes = (IsAuthenticated,)
+    # permission_classes = (IsAuthenticated,)
+    permission_classes = (AllowAny,)
 
     def get(self, request):
-        tasks = Task.objects.filter(owner_id=request.user.id)
-        serializer = TaskSerializer(tasks, many=True)
-        return Response(data={"tasks": serializer.data})
+        return Response(TaskSerializer(Task.objects.all(), many=True).data)
+        # tasks = Task.objects.filter(owner_id=request.user.id)
+        # serializer = TaskSerializer(tasks, many=True)
+        # return Response(data=serializer.data)
 
     def post(self, request, format=None):
         form = TaskForm(
@@ -34,9 +36,7 @@ class TaskList(APIView):
         if form.is_valid():
             task = form.save()
             serializer = TaskSerializer(task)
-            return Response(
-                data={"task": serializer.data}, status=status.HTTP_201_CREATED
-            )
+            return Response(data=serializer.data, status=status.HTTP_201_CREATED)
         return Response(data=form.errors)
 
 
@@ -85,7 +85,7 @@ class TaskDetail(APIView):
             )
         if request.user == task.owner:
             task.delete()
-            return Response(status=status.HTTP_204_NO_CONTENT)
+            return Response(data={"message": "ok"}, status=status.HTTP_200_OK)
         return Response(
             data={"message": "permission_denied"}, status=status.HTTP_403_FORBIDDEN
         )
